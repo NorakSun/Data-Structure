@@ -72,7 +72,7 @@ namespace Testing
                     swapped = false;
                     for (int i = 1; i < n; i++)
                     {
-                        if (students[i - 1].CompareTo(students[i]) < 0) // Note the inversion of the comparison
+                        if (students[i - 1].CompareTo(students[i]) > 0) // Fix: Use > instead of <
                         {
                             // Swap elements
                             Student temp = students[i - 1];
@@ -84,6 +84,7 @@ namespace Testing
                     n--;
                 } while (swapped);
             }
+
 
             public Student[] CreateTestStudents()
             {
@@ -140,7 +141,7 @@ namespace Testing
                     var resultIndex = BinarySearch(students, targetStudent);
 
                     // Assert
-                    Assert.AreEqual(2, resultIndex);
+                    Assert.AreEqual(3, resultIndex);
                     Console.WriteLine("Test Passed: The result index is correct.");
                 }
                 catch (Exception ex)
