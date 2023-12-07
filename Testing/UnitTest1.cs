@@ -3,180 +3,195 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+
 namespace Testing
 {
-    
+   
     public class UnitTest1
-    {
+    { 
         public class Student : IComparable<Student>
         {
-            public string Name { get; set; }
-            public int Id { get; set; }
+        // Constants
+        public const string DefaultStudentID = "N/A";
 
+        // Properties
+        public string StudentID { get; set; }
 
-            // You need to implement the IComparable interface to use Bubble Sort
-            public int CompareTo(Student other)
-            {
-                return string.Compare(this.Name, other.Name);
-            }
-
-        }
-
-        [TestClass]
-        public class SortingAndSearchingTests
+        // Constructor with all arguments
+        public Student(string studentID)
         {
-            public int LinearSearch(Student[] students, Student target)
+            StudentID = studentID;
+        }
+
+        // Constructor with no arguments (using default values)
+        public Student() : this(DefaultStudentID)
+        {
+        }
+
+        // ToString method
+        public override string ToString()
+        {
+            return $"Student: StudentID: {StudentID}";
+        }
+
+        // Implementation of IComparable interface
+        public int CompareTo(Student other)
+        {
+            if (other == null)
+                return 1;
+
+            // Compare StudentID for ordering
+            return string.Compare(this.StudentID, other.StudentID, StringComparison.Ordinal);
+        }
+    }
+
+    [TestClass]
+    public class SortingAndSearchingTests
+    {
+        public int LinearSearch(Student[] students, Student target)
+        {
+            for (int i = 0; i < students.Length; i++)
             {
-                for (int i = 0; i < students.Length; i++)
+                if (students[i].Equals(target))
                 {
-                    if (students[i].Equals(target))
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        public int BinarySearch(Student[] students, Student target)
+        {
+            int left = 0, right = students.Length - 1;
+
+            while (left <= right)
+            {
+                int middle = (left + right) / 2;
+                int comparisonResult = string.Compare(students[middle].StudentID, target.StudentID);
+
+                if (comparisonResult == 0)
+                {
+                    return middle;
+                }
+                else if (comparisonResult < 0)
+                {
+                    left = middle + 1;
+                }
+                else
+                {
+                    right = middle - 1;
+                }
+            }
+
+            return -1;
+        }
+
+        public void BubbleSort(Student[] students)
+        {
+            int n = students.Length;
+            bool swapped;
+            do
+            {
+                swapped = false;
+                for (int i = 1; i < n; i++)
+                {
+                    if (students[i - 1].CompareTo(students[i]) > 0)
                     {
-                        return i;
+                        // Swap elements
+                        Student temp = students[i - 1];
+                        students[i - 1] = students[i];
+                        students[i] = temp;
+                        swapped = true;
                     }
                 }
-                return -1;
-            }
+                n--;
+            } while (swapped);
+        }
 
-            public int BinarySearch(Student[] students, Student target)
+        [TestMethod]
+        public void TestLinearSearch()
+        {
+            // Arrange
+            var students = CreateTestStudents();
+            var targetStudent = students[3]; // Assume the target student is at index 3
+
+            try
             {
-                int left = 0, right = students.Length - 1;
+                // Act
+                var resultIndex = LinearSearch(students, targetStudent);
 
-                while (left <= right)
-                {
-                    int middle = (left + right) / 2;
-                    int comparisonResult = string.Compare(students[middle].Name, target.Name);
-
-                    if (comparisonResult == 0)
-                    {
-                        return middle;
-                    }
-                    else if (comparisonResult < 0)
-                    {
-                        left = middle + 1;
-                    }
-                    else
-                    {
-                        right = middle - 1;
-                    }
-                }
-
-                return -1;
+                // Assert
+                Assert.AreEqual(3, resultIndex);
+                Console.WriteLine("Test Passed: The result index is correct.");
             }
-
-            public void BubbleSort(Student[] students)
+            catch (Exception ex)
             {
-                int n = students.Length;
-                bool swapped;
-                do
-                {
-                    swapped = false;
-                    for (int i = 1; i < n; i++)
-                    {
-                        if (students[i - 1].CompareTo(students[i]) > 0) // Fix: Use > instead of <
-                        {
-                            // Swap elements
-                            Student temp = students[i - 1];
-                            students[i - 1] = students[i];
-                            students[i] = temp;
-                            swapped = true;
-                        }
-                    }
-                    n--;
-                } while (swapped);
-            }
-
-
-            public Student[] CreateTestStudents()
-            {
-                return new[]
-                {
-                    new Student { Id = 1, Name = "Alice" },
-                    new Student { Id = 2, Name = "Bob" },
-                    new Student { Id = 3, Name = "Charlie" },
-                    new Student { Id = 4, Name = "David" },
-                    new Student { Id = 5, Name = "Eva" },
-                    new Student { Id = 6, Name = "Frank" },
-                    new Student { Id = 7, Name = "Grace" },
-                    new Student { Id = 8, Name = "Hank" },
-                    new Student { Id = 9, Name = "Ivy" },
-                    new Student { Id = 10, Name = "Jack" }
-                };
-            }
-
-            [TestMethod]
-            public void TestLinearSearch()
-            {
-                // Arrange
-                var students = CreateTestStudents();
-                var targetStudent = students[3]; // Assume the target student is at index 3
-
-                try
-                {
-                    // Act
-                    var resultIndex = LinearSearch(students, targetStudent);
-
-                    // Assert
-                    Assert.AreEqual(3, resultIndex);
-                    Console.WriteLine("Test Passed: The result index is correct.");
-                    
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail($"Exception thrown: {ex.Message}");
-                   
-                }
-            }
-
-            [TestMethod]
-            public void TestBinarySearch()
-            {
-                // Arrange
-                var students = CreateTestStudents();
-                var targetStudent = students[3]; // Assume the target student is at index 3
-
-                try
-                {
-                    // Act
-                    Array.Sort(students, (s1, s2) => s1.Name.CompareTo(s2.Name));
-                    var resultIndex = BinarySearch(students, targetStudent);
-
-                    // Assert
-                    Assert.AreEqual(3, resultIndex);
-                    Console.WriteLine("Test Passed: The result index is correct.");
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail($"Exception thrown: {ex.Message}");
-                }
-            }
-
-            [TestMethod]
-            public void TestBubbleSort()
-            {
-                // Arrange
-                var students = CreateTestStudents();
-                var ascendingOrderStudents = students.OrderByDescending(student => student.Id).ToArray();
-
-                try
-                {
-                    // Act
-                    BubbleSort(ascendingOrderStudents);
-
-                    // Assert
-                    var sortedStudents = new List<Student>(ascendingOrderStudents);
-                    sortedStudents.Sort(); 
-                    CollectionAssert.AreEqual(sortedStudents, ascendingOrderStudents);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail($"Exception thrown: {ex.Message}");
-                }
-                
+                Assert.Fail($"Exception thrown: {ex.Message}");
             }
         }
 
-        // Singly Linked List Node
-        public class SinglyListNode
+        [TestMethod]
+        public void TestBinarySearch()
+        {
+            // Arrange
+            var students = CreateTestStudents();
+            var targetStudent = students[3]; // Assume the target student is at index 3
+
+            try
+            {
+                // Act
+                Array.Sort(students);
+                var resultIndex = BinarySearch(students, targetStudent);
+
+                // Assert
+                Assert.AreEqual(3, resultIndex);
+                Console.WriteLine("Test Passed: The result index is correct.");
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail($"Exception thrown: {ex.Message}");
+            }
+        }
+
+        [TestMethod]
+        public void TestBubbleSort()
+        {
+            // Arrange
+            var students = CreateTestStudents();
+            var ascendingOrderStudents = students.OrderByDescending(student => student.StudentID).ToArray();
+
+            try
+            {
+                // Act
+                BubbleSort(ascendingOrderStudents);
+
+                // Assert
+                var sortedStudents = new List<Student>(ascendingOrderStudents);
+                sortedStudents.Sort();
+                CollectionAssert.AreEqual(sortedStudents, ascendingOrderStudents);
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail($"Exception thrown: {ex.Message}");
+            }
+        }
+
+        private Student[] CreateTestStudents()
+        {
+            // Create an array of test students
+            return new Student[]
+            {
+            new Student("S001"),
+            new Student("S003"),
+            new Student("S002"),
+            new Student("S004")
+            };
+        }
+    }
+
+
+    // Singly Linked List Node
+    public class SinglyListNode
         {
             public Student Data { get; set; }
             public SinglyListNode Next { get; set; }
@@ -263,7 +278,7 @@ namespace Testing
             {
                 // Arrange
                 var list = new SinglyLinkedList();
-                var student = new Student { Id = 1, Name = "Alice" };
+                var student = new Student { StudentID = "1"};
 
                 // Act
                 list.AddToHead(student);
@@ -278,9 +293,9 @@ namespace Testing
             {
                 // Arrange
                 var list = new SinglyLinkedList();
-                var initialHead = new Student { Id = 0, Name = "Initial Head" };
+                var initialHead = new Student { StudentID = "1" };
                 list.AddToHead(initialHead);  // Add an initial head for testing purposes
-                var student = new Student { Id = 1, Name = "Alice" };
+                var student = new Student {StudentID = "1" };
 
                 // Act
                 list.AddToTail(student);
@@ -297,11 +312,11 @@ namespace Testing
             {
                 // Arrange
                 var list = new SinglyLinkedList();
-                var student = new Student { Id = 2, Name = "Bob" };
+                var student = new Student {StudentID = "1" };
                 list.AddToHead(student);
 
                 // Act
-                var differentStudent = new Student {Id = 2, Name = "Alice" };
+                var differentStudent = new Student {StudentID = "1" };
                 var containsStudent = list.Contains(student);
 
                 // Assert
@@ -314,7 +329,7 @@ namespace Testing
             {
                 // Arrange
                 var list = new SinglyLinkedList();
-                var student = new Student { Id = 1, Name = "Alice" };
+                var student = new Student {StudentID = "1" };
                 list.AddToHead(student);
 
                 // Act
@@ -330,7 +345,7 @@ namespace Testing
             {
                 // Arrange
                 var list = new SinglyLinkedList();
-                var student = new Student { Id = 1, Name = "Alice" };
+                var student = new Student {StudentID = "1" };
                 list.AddToHead(student);
 
                 // Act
@@ -367,7 +382,7 @@ namespace Testing
                     Tail = Head;
             }
 
-            public void AddToTail(Student student)
+            public void AddToTail(Student    student)
             {
                 var newNode = new DoublyListNode { Data = student, Previous = Tail };
                 if (Tail != null)
@@ -430,7 +445,7 @@ namespace Testing
                 {
                     // Arrange
                     var list = new DoublyLinkedList();
-                    var student = new Student { Id = 1, Name = "Alice" };
+                    var student = new Student {StudentID = "1" };
 
                     // Act
                     list.AddToHead(student);
@@ -446,7 +461,7 @@ namespace Testing
                 {
                     // Arrange
                     var list = new DoublyLinkedList();
-                    var student = new Student { Id = 1, Name = "Alice" };
+                    var student = new Student {StudentID = "1" };
 
                     // Act
                     list.AddToTail(student);
@@ -462,7 +477,7 @@ namespace Testing
                 {
                     // Arrange
                     var list = new DoublyLinkedList();
-                    var student = new Student { Id = 1, Name = "Alice" };
+                    var student = new Student {StudentID = "1" };
                     list.AddToHead(student);
 
                     // Act
@@ -478,7 +493,7 @@ namespace Testing
                 {
                     // Arrange
                     var list = new DoublyLinkedList();
-                    var student = new Student { Id = 1, Name = "Alice" };
+                    var student = new Student {StudentID = "1" };
                     list.AddToHead(student);
 
                     // Act
@@ -495,7 +510,7 @@ namespace Testing
                 {
                     // Arrange
                     var list = new DoublyLinkedList();
-                    var student = new Student { Id = 1, Name = "Alice" };
+                    var student = new Student {StudentID = "1" };
                     list.AddToHead(student);
 
                     // Act
@@ -541,14 +556,15 @@ namespace Testing
                     return new BTreeNode(student);
                 }
 
-                if (student.Id < root.Data.Id)
+                if (string.Compare(student.StudentID, root.Data.StudentID) < 0)
                 {
                     root.Left = InsertRecursive(root.Left, student);
                 }
-                else if (student.Id > root.Data.Id)
+                else if (string.Compare(student.StudentID, root.Data.StudentID) > 0)
                 {
                     root.Right = InsertRecursive(root.Right, student);
                 }
+
 
                 return root;
             }
@@ -564,19 +580,19 @@ namespace Testing
                 var bTree = new BTree();
 
                 // Act
-                bTree.Insert(new Student { Name = "Alice", Id = 101 });
-                bTree.Insert(new Student { Name = "Bob", Id = 72 });
-                bTree.Insert(new Student { Name = "Charlie", Id = 128 });
-                bTree.Insert(new Student { Name = "David", Id = 50 });
-                bTree.Insert(new Student { Name = "Eva", Id = 90 });
+                bTree.Insert(new Student { StudentID="3"});
+                bTree.Insert(new Student { StudentID="1"});
+                bTree.Insert(new Student {StudentID = "2" });
+                bTree.Insert(new Student {StudentID = "5" });
+                bTree.Insert(new Student {StudentID = "7"});
 
                 // Assert
                 Assert.IsNotNull(bTree.Root, "Root should not be null");
-                Assert.AreEqual("Alice", bTree.Root.Data.Name, "Root data should be Alice");
+                Assert.AreEqual("3", bTree.Root.Data.StudentID, "Root data should be 3");
                 Assert.IsNotNull(bTree.Root.Left, "Root left child should not be null");
-                Assert.AreEqual("Bob", bTree.Root.Left.Data.Name, "Root left child data should be Bob");
+                Assert.AreEqual("1", bTree.Root.Left.Data.StudentID, "Root left child data should be 1");
                 Assert.IsNotNull(bTree.Root.Right, "Root right child should not be null");
-                Assert.AreEqual("Charlie", bTree.Root.Right.Data.Name, "Root right child data should be Charlie");
+                Assert.AreEqual("5", bTree.Root.Right.Data.StudentID, "Root right child data should be 5");
                 Console.WriteLine("TestBTreeInsert passed successfully.");
             }
 

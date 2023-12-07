@@ -1,11 +1,11 @@
-﻿using Data_Structure;
+﻿using DataStructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Data_Structure
+namespace DataStructure
 {
     public class BinaryTreeNode<T>
     {
