@@ -1,59 +1,58 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataStructure
 {
     public class Enrollment
     {
-        // Constants
-        public const string DefaultDateEnrolled = "N/A";
-        public const string DefaultGrade = "N/A";
-        public const string DefaultSemester = "N/A";
-
         // Properties
-        public string DateEnrolled { get; set; }
-        public string Grade { get; set; }
-        public string Semester { get; set; }
+        public string CourseCode { get; set; }
+        public string CourseName { get; set; }
+        public double Cost { get; set; }
+        public List<Enrollment> Enrollments { get; set; }
 
         // Constructor with all arguments
-        public Enrollment(string dateEnrolled, string grade, string semester)
+        public Enrollment(string courseCode, string courseName, double cost, List<Enrollment> enrollments)
         {
-            DateEnrolled = dateEnrolled;
-            Grade = grade;
-            Semester = semester;
+            CourseCode = courseCode;
+            CourseName = courseName;
+            Cost = cost;
+            Enrollments = enrollments;
         }
 
-        // Constructor with no arguments (using default values)
-        public Enrollment() : this(DefaultDateEnrolled, DefaultGrade, DefaultSemester)
+        // Constructor with no arguments
+        public Enrollment() : this("N/A", "N/A", 0, new List<Enrollment>())
         {
         }
 
         // ToString method
         public override string ToString()
         {
-            return $"Enrollment: Date Enrolled: {DateEnrolled}, Grade: {Grade}, Semester: {Semester}";
+            string enrollmentInfo = string.Join(", ", Enrollments);
+            return $"Course: Code: {CourseCode}, Name: {CourseName}, Cost: {Cost:C}, Enrollments: {enrollmentInfo}";
         }
     }
 
-/*    class Program
+ /*   public class Program
     {
         static void Main()
         {
             // Using constructors with all arguments and no arguments
-            Enrollment enrollment1 = new Enrollment("2023-01-15", "12", "1");
-            Enrollment enrollment2 = new Enrollment();
+            Enrollment enrollment1 = new Enrollment("CS101", "Introduction to Programming", 500.00, new List<Enrollment>());
+            Enrollment enrollment2 = new Enrollment("CS102", "Data Structures", 600.00, new List<Enrollment>());
+
+            List<Enrollment> enrollments = new List<Enrollment> { enrollment1, enrollment2 };
+
+            Enrollment course1 = new Enrollment("2023-01-15", "A", 1, enrollments);
+            Enrollment course2 = new Enrollment("2023-02-20", "B", 2, new List<Enrollment>());
 
             // Displaying information using ToString method
-            Console.WriteLine("Enrollment 1 Information:");
-            Console.WriteLine(enrollment1.ToString());
+            Console.WriteLine("Course 1 Information:");
+            Console.WriteLine(course1.ToString());
             Console.WriteLine();
 
-            Console.WriteLine("Enrollment 2 Information:");
-            Console.WriteLine(enrollment2.ToString());
+            Console.WriteLine("Course 2 Information:");
+            Console.WriteLine(course2.ToString());
         }
     }*/
-
 }
